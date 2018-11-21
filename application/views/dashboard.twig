@@ -1,0 +1,199 @@
+{% extends 'layouts/back_end.twig' %}
+
+{% block head %}
+    {{ parent() }}
+{% endblock %}
+
+{% block title %}{{ parent() }} | Dashboard{% endblock %}
+
+{% block navbar %}
+	{{ parent() }}
+{% endblock %}
+
+{% block sidebar %}
+	{{ parent() }}
+{% endblock %}
+
+{% block content_header %}
+    <h1>
+	    Dashboard
+	    <small>Control panel</small>
+	</h1>
+	<ol class="breadcrumb">
+	    <li class="active"><i class="fa fa-dashboard"></i> &nbsp;Dashboard</li>
+	</ol>
+{% endblock %}
+
+{% block content %}
+	<!-- Small boxes (Stat box) -->
+	<div class="row">
+	    <div class="col-lg-4 col-xs-6">
+	      <!-- small box -->
+	      <div class="small-box bg-green">
+	        <div class="inner">
+	          <h3>{{ member_count }}</h3>
+
+	          <h4>Member(s)</h4>
+	        </div>
+	        <div class="icon">
+	          <i class="fa fa-user"></i>
+	        </div>
+	        <a href="{{ base_url('users/member') }}" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+	      </div>
+	    </div>
+	    <!-- ./col -->
+	    <div class="col-lg-4 col-xs-6">
+	      <!-- small box -->
+	      <div class="small-box bg-green">
+	        <div class="inner">
+	          <h3>{{ expert_count }}</h3>
+
+	          <h4>Expert(s)</h4>
+	        </div>
+	        <div class="icon">
+	          <i class="fa fa-user-circle-o"></i>
+	        </div>
+	        <a href="{{ base_url('users/expert') }}" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+	      </div>
+	    </div>
+	    <!-- ./col -->
+	    <div class="col-lg-4 col-xs-6">
+	      <!-- small box -->
+	      <div class="small-box bg-green">
+	        <div class="inner">
+	          <h3>{{ chat_count }}</h3>
+
+	          <h4>Chat(s)</h4>
+	        </div>
+	        <div class="icon">
+	          <i class="fa fa-wechat"></i>
+	        </div>
+	        <a href="{{ base_url('chat-history') }}" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+	      </div>
+	    </div>
+	    <!-- ./col -->
+	  </div>
+	  <!-- /.row -->
+
+	  <h3>
+	    Balance Request
+	    <small>Top Up & Transfer</small>
+	  </h3>
+
+	<div class="row">
+	    <div class="col-lg-6 col-xs-6">
+	      <!-- small box -->
+	      <div class="small-box bg-purple">
+	        <div class="inner" id="blink_top_up">
+	          <h3 id="top_up_count">{{ top_up_count }}</h3>
+
+	          <h4>Top Up Request(s)</h4>
+	        </div>
+	        <div class="icon">
+	          <i class="fa fa-credit-card"></i>
+	        </div>
+	        <a href="{{ base_url('top-up/request') }}" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+	      </div>
+	    </div>
+	    <div class="col-lg-6 col-xs-6">
+	      <!-- small box -->
+	      <div class="small-box bg-purple">
+	        <div class="inner" id="blink_transfer">
+	          <h3 id="transfer_count">{{ transfer_count }}</h3>
+
+	          <h4>Transfer Request(s)</h4>
+	        </div>
+	        <div class="icon">
+	          <i class="fa fa-send"></i>
+	        </div>
+	        <a href="{{ base_url('transfer/request') }}" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+	      </div>
+	    </div>
+	</div>
+
+	<h3>
+	    Revenue
+	    <small>Amount of Revenue</small>
+	  </h3>
+
+	<div class="row">
+	    <div class="col-lg-12 col-xs-12">
+	      <!-- small box -->
+	      <div class="small-box bg-blue">
+	        <div class="inner" id="blink_top_up">
+	          <h3 id="top_up_count">IDR {{ total_revenue|number_format(2,',','.') }}</h3>
+
+	          <h4>Revenue Total</h4>
+	          <br />
+	        </div>
+	        <div class="icon">
+	          <i class="fa fa-bitcoin"></i>
+	        </div>
+	      </div>
+	    </div>
+	    <div class="col-lg-6 col-xs-12">
+	      <!-- small box -->
+	      <div class="small-box bg-blue">
+	        <div class="inner" id="blink_transfer">
+	          <h3 id="transfer_count">IDR {{ total_balance_member|number_format(2,',','.') }}</h3>
+
+	          <h4>Member Balance Total</h4>
+	          <br />
+	        </div>
+	        <div class="icon">
+	          <i class="fa fa-bitcoin"></i>
+	        </div>
+	      </div>
+	    </div>
+	    <div class="col-lg-6 col-xs-12">
+	    <!-- small box -->
+	      <div class="small-box bg-blue">
+	        <div class="inner" id="blink_top_up">
+	          <h3 id="top_up_count">IDR {{ total_balance_expert|number_format(2,',','.') }}</h3>
+
+	          <h4>Expert Balance Total</h4>
+	          <br />
+	        </div>
+	        <div class="icon">
+	          <i class="fa fa-bitcoin"></i>
+	        </div>
+	      </div>
+	    </div>
+	    <div class="col-lg-6 col-xs-12">
+	      <!-- small box -->
+	      <div class="small-box bg-blue">
+	        <div class="inner" id="blink_transfer">
+	          <h3 id="transfer_count">IDR {{ total_transfer|number_format(2,',','.') }}</h3>
+
+	          <h4>Transfer Total</h4>
+	          <br />
+	        </div>
+	        <div class="icon">
+	          <i class="fa fa-bitcoin"></i>
+	        </div>
+	      </div>
+	    </div>
+	    <div class="col-lg-6 col-xs-12">
+	      <!-- small box -->
+	      <div class="small-box bg-blue">
+	        <div class="inner" id="blink_transfer">
+	          <h3 id="transfer_count">IDR {{ total_fee|number_format(2,',','.') }}</h3>
+
+	          <h4>Fee DokterChat Total</h4>
+	          <br />
+	        </div>
+	        <div class="icon">
+	          <i class="fa fa-bitcoin"></i>
+	        </div>
+	      </div>
+	    </div>
+	</div>
+{% endblock %}
+
+{% block footer %}
+	{{ parent() }}
+{% endblock %}
+
+{% block javascript %}
+	{{ parent() }}
+{% endblock %}

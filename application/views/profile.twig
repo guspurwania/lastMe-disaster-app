@@ -1,0 +1,207 @@
+{% extends 'layouts/back_end.twig' %}
+
+{% block head %}
+    {{ parent() }}
+{% endblock %}
+
+{% block title %}{{ parent() }} | Profile{% endblock %}
+
+{% block navbar %}
+	{{ parent() }}
+{% endblock %}
+
+{% block sidebar %}
+	{{ parent() }}
+{% endblock %}
+
+{% block content_header %}
+    <h1>
+	   Profile
+	    <small>User Profile</small>
+	</h1>
+	<ol class="breadcrumb">
+		<li><a href="{{ base_url('dashboard') }}"><i class="fa fa-dashboard"></i> Dashboard</a></li>
+	    <li class="active"><i class="fa fa-user"></i>  Profile</li>
+	</ol>
+{% endblock %}
+
+{% block content %}
+	<div class="row">
+		<div class="col-md-4">
+
+          <!-- Profile Image -->
+          <div class="box box-primary">
+            <div class="box-body box-profile">
+              {% if session.avatar is empty or session.avatar == '' %}
+                  <img class="profile-user-img img-responsive img-circle" src="{{ base_url() }}assets/adminlte/dist/img/user2-160x160.jpg" alt="User profile picture">
+              {% else %}
+                  <img class="profile-user-img img-responsive img-circle" src="{{ base_url() }}assets/images/avatar/{{ session.avatar }}" alt="User profile picture">
+              {% endif %} 
+
+              <h3 class="profile-username text-center">{{ user.username }}</h3>
+
+              <p class="text-muted text-center">
+                Administrator
+              </p>
+
+              <ul class="list-group list-group-unbordered">
+              	<li class="list-group-item">
+                  <b>Full Name</b> <a class="pull-right">{{ admin.name }}</a>
+                </li>
+                <li class="list-group-item">
+                  <b>Display Name</b> <a class="pull-right">{{ user.username }}</a>
+                </li>
+                <li class="list-group-item">
+                  <b>Email</b> <a class="pull-right">{{ user.email }}</a>
+                </li>
+                <li class="list-group-item">
+                  <b>Phone</b> <a class="pull-right">{{ admin.phone }}</a>
+                </li>
+              </ul>
+
+            </div>
+            <!-- /.box-body -->
+          </div>
+          <!-- /.box -->
+        </div>
+
+        <div class="col-md-8">
+            {% if message is not empty %}
+                <div class="alert alert-danger">{{ message|raw }}</div>
+            {% endif %}
+            {% if success is not empty %}
+                <div class="alert alert-info">{{ success|raw }}</div>
+            {% endif %}
+            <div class="nav-tabs-custom">
+                <ul class="nav nav-tabs">
+                    <li class="active">
+                        <a href="#edit" data-toggle="tab">Edit Profile</a>
+                    </li>
+                    <li>
+                        <a href="#avatar" data-toggle="tab">Change Avatar</a>
+                    </li>
+                    <li>
+                        <a href="#change" data-toggle="tab">Change Password</a>
+                    </li>
+                </ul>
+            
+                <div class="tab-content">
+                    <div class="tab-pane active" id="edit">
+                        <form class="form-horizontal" method="POST" action="{{ base_url('profile/save_profile') }}">
+                          <div class="form-group">
+                            <label for="inputName" class="col-sm-2 control-label">Full Name</label>
+
+                            <div class="col-sm-10">
+                              <input type="text" class="form-control" id="name" name="name" placeholder="Full Name" value="{{ admin.name }}">
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <label for="inputEmail" class="col-sm-2 control-label">Display Name</label>
+
+                            <div class="col-sm-10">
+                              <input type="text" class="form-control" id="username" name="username" placeholder="Display Name" value="{{user.username }}">
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <label for="inputEmail" class="col-sm-2 control-label">Gender</label>
+
+                            <div class="col-sm-10">
+                              <div class="radio">
+                              	<label>
+                              		<input type="radio" name="gender" id="man" value="L" {% if admin.gender == 'L' %}checked{% endif %}> Laki- Laki
+                              	</label>
+                              </div>
+                              <div class="radio">
+                              	<label>
+                              		<input type="radio" name="gender" id="woman" value="P" {% if admin.gender == 'P' %}checked{% endif %}> Perempuan
+                              	</label>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <label for="inputName" class="col-sm-2 control-label">Email</label>
+
+                            <div class="col-sm-10">
+                              <input type="text" class="form-control" id="email" name="email" placeholder="Email" value="{{ user.email }}">
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <label for="inputExperience" class="col-sm-2 control-label">Phone</label>
+
+                            <div class="col-sm-10">
+                              <input type="text" class="form-control" id="phone" name="phone" value="{{ admin.phone }}" placeholder="Phone">
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <label for="inputExperience" class="col-sm-2 control-label">Address</label>
+
+                            <div class="col-sm-10">
+                             	<textarea class="form-control" id="address" name="address">{{ admin.address }}</textarea>
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">
+                              <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                          </div>
+                        </form>
+                    </div>
+                    <div class="tab-pane" id="avatar">
+                    	<form class="form-horizontal" method="POST" action="{{ base_url('profile/save_avatar') }}" enctype="multipart/form-data">
+                    		<div class="form-group">
+	                            <label for="inputName" class="col-sm-2 control-label">Avatar</label>
+
+	                            <div class="col-sm-10">
+	                            	<input type="file" name="avatar" id="avatar" class="form-control">
+	                            </div>
+	                        </div>
+	                        <div class="form-group">
+	                            <div class="col-sm-offset-2 col-sm-10">
+	                              <button type="submit" class="btn btn-primary">Submit</button>
+	                            </div>
+	                        </div>
+                    	</form>
+                    </div>
+                    <div class="tab-pane" id="change">
+                        <form class="form-horizontal" method="POST" action="{{ base_url('profile/save_password') }}">
+                            <div class="form-group">
+                                <label for="inputName" class="col-sm-3 control-label">Old Password</label>
+
+                                <div class="col-sm-9">
+                                  <input type="password" class="form-control" name="old" id="old"  minlength="8" maxlength="20" required="required">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="inputName" class="col-sm-3 control-label">New Password</label>
+
+                                <div class="col-sm-9">
+                                  <input type="password" class="form-control" name="new" id="new"  minlength="8" maxlength="20" required="required">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="inputName" class="col-sm-3 control-label">Retype New Password</label>
+
+                                <div class="col-sm-9">
+                                  <input type="password" class="form-control" name="new_confirm" id="new_confirm"  minlength="8" maxlength="20" required="required">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-offset-3 col-sm-9">
+                                  <button type="submit" class="btn btn-primary">Submit</button>
+                                </div>
+                              </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+	</div>
+{% endblock %}
+
+{% block footer %}
+	{{ parent() }}
+{% endblock %}
+
+{% block javascript %}
+	{{ parent() }}
+{% endblock %}

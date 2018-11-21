@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<!--
+This is a starter template page. Use this page to start your new project from
+scratch. This page gets rid of all links and provides the needed markup only.
+-->
+<html>
+<head>
+    {% block head %}
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>{% block title %}Dokter Chat Administrator{% endblock %}</title>
+        <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+        <!-- Bootstrap 3.3.7 -->
+        <link rel="stylesheet" href="{{ base_url('assets/adminlte/') }}bower_components/bootstrap/dist/css/bootstrap.min.css">
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="{{ base_url('assets/adminlte/') }}bower_components/font-awesome/css/font-awesome.min.css">
+        <!-- Ionicons -->
+        <link rel="stylesheet" href="{{ base_url('assets/adminlte/') }}bower_components/Ionicons/css/ionicons.min.css">
+        <!-- Theme style -->
+        <link rel="stylesheet" href="{{ base_url('assets/adminlte/') }}dist/css/AdminLTE.min.css">
+        <!-- AdminLTE Skins. Choose a skin from the css/skins
+             folder instead of downloading all of them to reduce the load. -->
+        <link rel="stylesheet" href="{{ base_url('assets/adminlte/') }}dist/css/skins/_all-skins.min.css">
+        <!-- Date Picker -->
+        <link rel="stylesheet" href="{{ base_url('assets/adminlte/') }}bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+        <!-- Daterange picker -->
+        <link rel="stylesheet" href="{{ base_url('assets/adminlte/') }}bower_components/bootstrap-daterangepicker/daterangepicker.css">
+        <!-- bootstrap wysihtml5 - text editor -->
+        <link rel="stylesheet" href="{{ base_url('assets/adminlte/') }}plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css">
+
+        <!-- Google Font -->
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+
+        <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async></script>
+
+        <script>
+          setTimeout(function(){
+               location.reload();
+           }, 60 * 1000);
+          
+            var OneSignal = window.OneSignal || [];
+
+            OneSignal.push(() => {
+              OneSignal.init({
+                appId: "cb47830c-20f5-4570-9183-fee5351f1447",
+                subdomainName: "https://docterchat.os.tc",
+                safari_web_id: 'web.onesignal.auto.1947bcbb-3df5-45a5-b464-0be0e15f4a2c',
+                autoRegister: false,
+                welcomeNotification: {
+                  title: 'DokterChat',
+                  message: 'Welcome to DokterChat!'
+                },
+                httpPermissionRequest: {
+                  enable: true
+                },
+                notifyButton: { enable: true },
+                persistNotification: false
+              })
+            })
+            
+            OneSignal.push(function() {
+              /* These examples are all valid */
+              OneSignal.setDefaultNotificationUrl("{{ base_url('dashboard') }}");
+              OneSignal.setDefaultTitle("DokterChat");
+            });
+
+            OneSignal.push(function() {
+              /* These examples are all valid */
+              var isPushSupported = OneSignal.isPushNotificationsSupported();
+              if (isPushSupported) {
+                console.log("Push notification supported!")
+                OneSignal.getUserId(function(userId) {
+                  if(userId)
+                  {
+                      console.log(userId);
+                      $.post("{{ base_url('api/v1/') }}user_notification/{{ session.user_id }}",
+                      {
+                          notification_id: userId
+                      },
+                      function(data, status){
+                          console.log(data.message);
+                      });
+                  }
+                });
+                // OneSignal.setSubscription(true);
+                OneSignal.push(["getNotificationPermission", function(permission) {
+                    console.log("Site Notification Permission:", permission);
+                    // (Output) Site Notification Permission: default
+                }]);
+              } else {
+                console.log("Push notification not supported!")
+              }
+            });
+
+            OneSignal.push(function() {
+              /* These examples are all valid */
+              OneSignal.isPushNotificationsEnabled(function(isEnabled) {
+                if (isEnabled)
+                  console.log("Push notifications are enabled!");
+                else
+                  console.log("Push notifications are not enabled yet.");    
+              });
+            });
+            
+            OneSignal.push(function() {
+              /* These examples are all valid */
+              OneSignal.getUserId(function(userId) {
+                if(userId)
+                {
+                    console.log(userId);
+                    $.post("{{ base_url('api/v1/') }}user_notification/{{ session.user_id }}",
+                    {
+                        notification_id: userId
+                    },
+                    function(data, status){
+                        console.log(data.message);
+                    });
+                }
+              });
+            });
+            
+            var audio1, audio2;
+            audio1 = new Audio("{{ base_url('assets/sound/top_up.mp3') }}");
+            audio2 = new Audio("{{ base_url('assets/sound/transfer.mp3') }}");
+            OneSignal.push(function() {
+                OneSignal.on('notificationDisplay', function (event) {
+                    if(event.data.flag == "top_up_request")
+                    {
+                        audio1.addEventListener('ended', function() {
+                            this.currentTime = 0;
+                            this.play();
+                        }, false);
+                        audio2.pause();
+                        audio1.play();
+                        
+                        {% if url == 'dashboard' %}
+                            top_up_count = parseInt($('#top_up_count').text()) + 1;
+                            $('#top_up_count').html(top_up_count);
+                            (function blink_top_up() { 
+                              $('#blink_top_up').fadeOut(500).fadeIn(500, blink_top_up); 
+                            })();
+                        {% endif %}
+                    }
+                    else if(event.data.flag == "transfer_request")
+                    {
+                        audio2.addEventListener('ended', function() {
+                            this.currentTime = 0;
+                            this.play();
+                        }, false);
+                        audio1.pause();
+                        audio2.play();
+                        
+                        {% if url == 'dashboard' %}
+                            transfer_count = parseInt($('#transfer_count').text()) + 1;
+                            $('#transfer_count').html(transfer_count);
+                            (function blink_transfer() { 
+                              $('#blink_transfer').fadeOut(500).fadeIn(500, blink_transfer); 
+                            })();
+                        {% endif %}
+                    }
+                });
+            });
+
+            OneSignal.push(function() {
+                OneSignal.on('notificationDismiss', function(event){
+                  audio1.pause();
+                  audio2.pause();
+                });
+            });
+
+            OneSignal.push(["addListenerForNotificationOpened", function(data) {
+              audio1.pause();
+              audio2.pause();
+            }]);
+        </script>
+    {% endblock %}
+</head>
+
+<body class="hold-transition skin-blue sidebar-mini">
+    <div class="wrapper">
+    
+    {% block navbar %}
+      <header class="main-header">
+        <!-- Logo -->
+        <a href="{{ base_url('dashboard') }}" class="logo">
+          <!-- mini logo for sidebar mini 50x50 pixels -->
+          <span class="logo-mini"><b>DC</b>A</span>
+          <!-- logo for regular state and mobile devices -->
+          <span class="logo-lg"><b>Dokter Chat</b> Admin</span>
+        </a>
+        <!-- Header Navbar: style can be found in header.less -->
+        <nav class="navbar navbar-static-top">
+          <!-- Sidebar toggle button-->
+          <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+            <span class="sr-only">Toggle navigation</span>
+          </a>
+
+          <div class="navbar-custom-menu">
+            <ul class="nav navbar-nav">
+              <!-- User Account: style can be found in dropdown.less -->
+              <li class="dropdown user user-menu">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                    {% if session.avatar is empty or session.avatar == '' %}
+                        <img src="{{ base_url() }}assets/adminlte/dist/img/user2-160x160.jpg" class="user-image" alt="User Image">
+                    {% else %}
+                        <img src="{{ base_url() }}assets/images/avatar/{{ session.avatar }}" class="user-image" alt="User Image">
+                    {% endif %}
+                  <span class="hidden-xs">{{ session.username }}</span>
+                </a>
+                <ul class="dropdown-menu">
+                  <!-- User image -->
+                  <li class="user-header">
+                    {% if session.avatar is empty or session.avatar == '' %}
+                        <img src="{{ base_url() }}assets/adminlte/dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
+                    {% else %}
+                        <img src="{{ base_url() }}assets/images/avatar/{{ session.avatar }}" class="img-circle" alt="User Image">
+                    {% endif %}
+
+                    <p>
+                      {{ session.username }} - Admin
+                      <small>Member since {{ session.created_at|date('M Y') }}</small>
+                    </p>
+                  </li>
+                  <!-- Menu Footer-->
+                  <li class="user-footer">
+                    <div class="pull-left">
+                      <a href="{{ base_url('profile') }}" class="btn btn-default btn-flat">Profile</a>
+                    </div>
+                    <div class="pull-right">
+                      <a href="{{ base_url('auth/logout') }}" class="btn btn-default btn-flat">Sign out</a>
+                    </div>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </nav>
+      </header>
+    {% endblock %}
+      <!-- Left side column. contains the logo and sidebar -->
+    {% block sidebar %}
+      <aside class="main-sidebar">
+        <!-- sidebar: style can be found in sidebar.less -->
+        <section class="sidebar">
+          <!-- Sidebar user panel -->
+          <div class="user-panel">
+            <div class="pull-left image">
+                {% if session.avatar is empty or session.avatar == '' %}
+                    <img src="{{ base_url() }}assets/adminlte/dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
+                {% else %}
+                    <img src="{{ base_url() }}assets/images/avatar/{{ session.avatar }}" class="img-circle" alt="User Image">
+                {% endif %}
+            </div>
+            <div class="pull-left info">
+              <p>{{ session.username }}</p>
+              <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
+            </div>
+          </div>
+          <br />
+          <!-- sidebar menu: : style can be found in sidebar.less -->
+          <ul class="sidebar-menu" data-widget="tree">
+            <li class="header">MAIN NAVIGATION</li>
+            <li {% if url == 'dashboard' %}class="active"{% endif %}>
+              <a href="{{ base_url('dashboard') }}">
+                <i class="fa fa-dashboard"></i> <span>Dashboard</span>
+              </a>
+            </li>
+            <li class="treeview {% if url == 'master-data' %}active{% endif %}">
+              <a href="#">
+                <i class="fa fa-files-o"></i> <span>Master Data</span>
+                <span class="pull-right-container">
+                  <i class="fa fa-angle-left pull-right"></i>
+                </span>
+              </a>
+              <ul class="treeview-menu">
+                <li {% if sub_url == 'call-center' %}class="active"{% endif %}><a href="{{ base_url('master-data/call-center') }}"><i class="fa fa-circle-o"></i> Call Center</a></li>
+                <li {% if sub_url == 'term-of-service' %}class="active"{% endif %}><a href="{{ base_url('master-data/term-of-service') }}"><i class="fa fa-circle-o"></i> Term of Service</a></li>
+                <li {% if sub_url == 'privacy-policy' %}class="active"{% endif %}><a href="{{ base_url('master-data/privacy-policy') }}"><i class="fa fa-circle-o"></i> Privacy Policy</a></li>
+                <li {% if sub_url == 'app-version' %}class="active"{% endif %}><a href="{{ base_url('master-data/app-version') }}"><i class="fa fa-circle-o"></i> App Version</a></li>
+                <li {% if sub_url == 'expert-category' %}class="active"{% endif %}><a href="{{ base_url('master-data/expert-category') }}"><i class="fa fa-circle-o"></i> Expert Categories</a></li>
+                <li {% if sub_url == 'banner' %}class="active"{% endif %}><a href="{{ base_url('master-data/banner') }}"><i class="fa fa-circle-o"></i> Banner</a></li>
+                <li {% if sub_url == 'bank' %}class="active"{% endif %}><a href="{{ base_url('master-data/bank') }}"><i class="fa fa-circle-o"></i> Bank</a></li>
+                <li {% if sub_url == 'free-chat-charge' %}class="active"{% endif %}><a href="{{ base_url('master-data/free-chat-charge') }}"><i class="fa fa-circle-o"></i> Administration Charge</a></li>
+              </ul>
+            </li>
+            <li class="treeview {% if url == 'users' %}active{% endif %}">
+              <a href="#">
+                <i class="fa fa-users"></i> <span>Users</span>
+                <span class="pull-right-container">
+                  <i class="fa fa-angle-left pull-right"></i>
+                </span>
+              </a>
+              <ul class="treeview-menu">
+                <li {% if sub_url == 'admin' %}class="active"{% endif %}><a href="{{ base_url('users/admin') }}"><i class="fa fa-circle-o"></i> Admin</a></li>
+                <li {% if sub_url == 'expert' %}class="active"{% endif %}><a href="{{ base_url('users/expert') }}"><i class="fa fa-circle-o"></i> Expert</a></li>
+                <li {% if sub_url == 'member' %}class="active"{% endif %}><a href="{{ base_url('users/member') }}"><i class="fa fa-circle-o"></i> Member</a></li>
+              </ul>
+            </li>
+            <li class="treeview {% if url == 'top-up' %}active{% endif %}">
+              <a href="#">
+                <i class="fa fa-credit-card"></i> <span>Top Up</span>
+                <span class="pull-right-container">
+                  <i class="fa fa-angle-left pull-right"></i>
+                </span>
+              </a>
+              <ul class="treeview-menu">
+                <li {% if (url == 'top-up') and (sub_url == 'request') %}class="active"{% endif %}>
+                    <a href="{{ base_url('top-up/request') }}">
+                        <i class="fa fa-circle-o"></i> Request
+                    </a>
+                </li>
+                <li {% if (url == 'top-up') and (sub_url == 'history') %}class="active"{% endif %}><a href="{{ base_url('top-up/history') }}"><i class="fa fa-circle-o"></i> History</a></li>
+              </ul>
+            </li>
+            <li class="treeview {% if url == 'transfer' %}active{% endif %}">
+              <a href="#">
+                <i class="fa fa-send"></i> <span>Transfer</span>
+                <span class="pull-right-container">
+                  <i class="fa fa-angle-left pull-right"></i>
+                </span>
+              </a>
+              <ul class="treeview-menu">
+                <li {% if (url == 'transfer') and (sub_url == 'request') %}class="active"{% endif %}>
+                    <a href="{{ base_url('transfer/request') }}">
+                        <i class="fa fa-circle-o"></i> Request
+                    </a>
+                </li>
+                <li {% if (url == 'transfer') and (sub_url == 'history') %}class="active"{% endif %}><a href="{{ base_url('transfer/history') }}"><i class="fa fa-circle-o"></i> History</a></li>
+              </ul>
+            </li>
+            <li class="treeview {% if url == 'chat' %}active{% endif %}">
+              <a href="#">
+                <i class="fa fa-wechat"></i> <span>Chat</span>
+                <span class="pull-right-container">
+                  <i class="fa fa-angle-left pull-right"></i>
+                </span>
+              </a>
+              <ul class="treeview-menu">
+                <li {% if (url == 'chat') and (sub_url == 'request') %}class="active"{% endif %}>
+                    <a href="{{ base_url('chat/request') }}">
+                        <i class="fa fa-circle-o"></i> Request
+                    </a>
+                </li>
+                <li {% if (url == 'chat') and (sub_url == 'history') %}class="active"{% endif %}>
+                    <a href="{{ base_url('chat/history') }}">
+                        <i class="fa fa-circle-o"></i> History
+                    </a>
+                </li>
+                <li {% if (url == 'chat') and (sub_url == 'free') %}class="active"{% endif %}>
+                    <a href="{{ base_url('chat/free') }}">
+                        <i class="fa fa-circle-o"></i> Free Chat
+                    </a>
+                </li>
+              </ul>
+            </li>
+            <li {% if url == 'chat-history' %}class="active"{% endif %}>
+              <a href="{{ base_url('chat-history') }}">
+                <i class="fa fa-wechat"></i> <span>Chat History</span>
+              </a>
+            </li>
+            <li class="treeview {% if url == 'voucher' %}active{% endif %}">
+              <a href="#">
+                <i class="fa fa-send"></i> <span>Voucher</span>
+                <span class="pull-right-container">
+                  <i class="fa fa-angle-left pull-right"></i>
+                </span>
+              </a>
+              <ul class="treeview-menu">
+                <li {% if sub_url == 'view' %}class="active"{% endif %}><a href="{{ base_url('voucher/view') }}"><i class="fa fa-circle-o"></i> Voucher Data</a></li>
+                <li {% if (url == 'voucher') and (sub_url == 'history') %}class="active"{% endif %}><a href="{{ base_url('voucher/history') }}"><i class="fa fa-circle-o"></i> Voucher History</a></li>
+              </ul>
+            </li>
+          </ul>
+        </section>
+        <!-- /.sidebar -->
+      </aside>
+    {% endblock %}
+
+      <!-- Content Wrapper. Contains page content -->
+      <div class="content-wrapper">
+        {% block announcement %}{% endblock %}
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+          {% block content_header %}{% endblock %}
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+            {% block content %}{% endblock %}
+        </section>
+        <!-- /.content -->
+      </div>
+      <!-- /.content-wrapper -->
+      {% block footer %}
+      <footer class="main-footer">
+        <div class="pull-right hidden-xs">
+          <b>Version</b> 1.0.0
+        </div>
+        <strong>Copyright &copy; 2017 <a href="https://www.dartdev.id" target="_blank">Digital Artisans</a>.</strong> All rights
+        reserved.
+      </footer>
+      {% endblock %}
+    </div>
+
+    <!-- REQUIRED JS SCRIPTS -->
+    {% block javascript %}
+        <!-- jQuery 3 -->
+        <script src="{{ base_url('assets/adminlte/') }}bower_components/jquery/dist/jquery.min.js"></script>
+        <!-- jQuery UI 1.11.4 -->
+        <script src="{{ base_url('assets/adminlte/') }}bower_components/jquery-ui/jquery-ui.min.js"></script>
+        <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+        <script>
+          $.widget.bridge('uibutton', $.ui.button);
+        </script>
+        <!-- Bootstrap 3.3.7 -->
+        <script src="{{ base_url('assets/adminlte/') }}bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+        <!-- daterangepicker -->
+        <script src="{{ base_url('assets/adminlte/') }}bower_components/moment/min/moment.min.js"></script>
+        <script src="{{ base_url('assets/adminlte/') }}bower_components/bootstrap-daterangepicker/daterangepicker.js"></script>
+        <!-- datepicker -->
+        <script src="{{ base_url('assets/adminlte/') }}bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+        <!-- Bootstrap WYSIHTML5 -->
+        <script src="{{ base_url('assets/adminlte/') }}plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.min.js"></script>
+        <!-- Slimscroll -->
+        <script src="{{ base_url('assets/adminlte/') }}bower_components/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+        <!-- FastClick -->
+        <script src="{{ base_url('assets/adminlte/') }}bower_components/fastclick/lib/fastclick.js"></script>
+        <!-- AdminLTE App -->
+        <script src="{{ base_url('assets/adminlte/') }}dist/js/adminlte.min.js"></script>
+    {% endblock %}
+</body>
+</html>
