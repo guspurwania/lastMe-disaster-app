@@ -36,7 +36,9 @@ class Disaster extends REST_Controller {
         $SWLat = $this->get('SWLat');
         $NELon = $this->get('NELon');
         $NELat = $this->get('NELat');
-        $response = Request::get($this->url.'?SWLon='.$SWLon.'&SWLat='.$SWLat.'&NELon='.$NELon.'&NELat='.$NELat.'&format=json')
+        $min_magnitude = $this->get('min_magnitude');
+        $since_last_hours = $this->get('since_last_hours');
+        $response = Request::get($this->url.'?SWLon='.$SWLon.'&SWLat='.$SWLat.'&NELon='.$NELon.'&NELat='.$NELat.'&since_last_hours='.$since_last_hours.'&min_magnitude='.$min_magnitude.'&format=json')
                     ->send();
 
         $this->response([
